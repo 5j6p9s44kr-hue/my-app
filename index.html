@@ -541,6 +541,7 @@
     background: #fff;
     border-top: 1px solid var(--line);
     z-index: 50;
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .nav-btn {
     flex: 1;
@@ -548,7 +549,7 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    padding: 10px 0 8px;
+    padding: 12px 0 14px;
     border: none;
     background: none;
     cursor: pointer;
@@ -764,6 +765,11 @@
         </div>
       </div>
 
+      <div class="field" style="margin-bottom: 44px;">
+        <div class="field-label">공지사항</div>
+        <div id="noticeListInline"></div>
+      </div>
+
     </div>
 
     <div class="submit-bar">
@@ -817,12 +823,12 @@
       </div>
 
       <div class="field" style="margin-bottom: 20px;">
-        <div class="field-label">비품요청 <span style="color:var(--muted); font-weight:500; font-size:12px;">(선택)</span></div>
+        <div class="field-label">비품요청 <span style="color:var(--muted); font-weight:500; font-size:12px;">선택</span></div>
         <input type="text" class="note-input mode-out" id="supplyRequestInput-out" placeholder="주문이 필요한 소모품을 적어주세요">
       </div>
 
       <div class="field" style="margin-bottom: 30px;">
-        <div class="field-label">특이사항 <span style="color:var(--muted); font-weight:500; font-size:12px;">(선택)</span></div>
+        <div class="field-label">특이사항 <span style="color:var(--muted); font-weight:500; font-size:12px;">선택</span></div>
         <input type="text" class="note-input mode-out" id="noteInput-out" placeholder="전달할 내용이 있으면 적어주세요">
       </div>
 
@@ -847,10 +853,14 @@
   </div>
   <div class="screen" id="screen-notice">
     <div class="check-body">
-      <div class="field">
-        <div class="field-label">공지사항</div>
+      <div class="field" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <div class="field-label" style="margin-bottom:0;">공지사항</div>
+        <button id="noticeWriteBtn" style="display:none; width:32px; height:32px; border-radius:50%; border:none; background:var(--ink); color:#fff; font-size:20px; line-height:1; cursor:pointer; align-items:center; justify-content:center;">+</button>
       </div>
       <div id="noticeList"></div>
+      <div style="text-align:center; margin-top:40px;">
+        <span id="logoutBtn" class="logout-link">로그아웃</span>
+      </div>
     </div>
   </div>
 
@@ -885,6 +895,8 @@ const STAFF_LOGIN = [
   { name: "양해영", pin: "930404" },
   { name: "홍윤희", pin: "940505" },
 ];
+const ADMIN_NAME = "박지수";
+const ADMIN_PIN = "950303";
 const BRANCHES = ["이수점"];
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbw8IFxqpCkrOOCwQP8ZvIr8zxNhedLtBk9_mbPe2oY_HcBFYVLsCciLPDXBTNHCfPFh/exec";
 const MAX_PHOTOS = 10;
@@ -902,7 +914,7 @@ function fmtTime(d) {
 }
 function fmtDate(d) {
   const days = ["일","월","화","수","목","금","토"];
-  return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} (${days[d.getDay()]})`;
+  return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}(${days[d.getDay()]})`;
 }
 function fmtDateShort(d) {
   const days = ["일","월","화","수","목","금","토"];
@@ -1057,7 +1069,8 @@ const loginSubmitBtn = document.getElementById("loginSubmitBtn");
 
 function tryLogin() {
   const pin = loginPinInput.value.trim();
-  const found = STAFF_LOGIN.find(s => s.pin === pin);
+  const isAdmin = pin === ADMIN_PIN;
+  const found = isAdmin ? { name: ADMIN_NAME } : STAFF_LOGIN.find(s => s.pin === pin);
   if (!found) {
     showToast("아이디를 다시 확인해 주세요.");
     loginPinInput.value = "";
@@ -1074,6 +1087,8 @@ function finishLogin() {
   if (nameEl) nameEl.textContent = loggedInStaff;
   const greetingNameEl = document.getElementById("greetingName-in");
   if (greetingNameEl) greetingNameEl.textContent = loggedInStaff;
+  const writeBtn = document.getElementById("noticeWriteBtn");
+  if (writeBtn) writeBtn.style.display = (loggedInStaff === ADMIN_NAME) ? "flex" : "none";
 }
 
 loginSubmitBtn.addEventListener("click", tryLogin);
@@ -1460,6 +1475,7 @@ async function loadNotices() {
     const data = await fetchJsonp(SHEET_API_URL + "?kind=notice");
     noticeItems = (data && data.items) ? data.items : [];
     renderNotices();
+    renderNoticesInline();
   } catch (err) {
     console.error(err);
     listEl.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div>불러오지 못했어요</div>`;
@@ -1470,6 +1486,27 @@ function renderNotices() {
   const listEl = document.getElementById("noticeList");
   if (noticeItems.length === 0) {
     listEl.innerHTML = `<div class="empty-state"><div class="icon">📢</div>등록된 공지사항이 없어요</div>`;
+    return;
+  }
+  const sorted = [...noticeItems].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  listEl.innerHTML = "";
+  sorted.forEach(n => {
+    const card = document.createElement("div");
+    card.className = "notice-card";
+    card.innerHTML = `
+      <div class="notice-title">${escapeHtml(n.title)}</div>
+      <div class="notice-date">${fmtFull(new Date(n.timestamp))} · ${escapeHtml(n.author || '')}</div>
+      <div class="notice-content">${escapeHtml(n.content)}</div>
+    `;
+    listEl.appendChild(card);
+  });
+}
+
+function renderNoticesInline() {
+  const listEl = document.getElementById("noticeListInline");
+  if (!listEl) return;
+  if (noticeItems.length === 0) {
+    listEl.innerHTML = `<div style="font-size:13px; color:var(--muted); padding:10px 0;">등록된 공지사항이 없어요</div>`;
     return;
   }
   const sorted = [...noticeItems].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -1502,6 +1539,8 @@ const outGreetingEmojiEl = document.getElementById("outGreetingEmoji");
 if (outGreetingEmojiEl) outGreetingEmojiEl.src = SMILE_EMOJI_B64;
 const cameraIconEl = document.getElementById("cameraIcon");
 if (cameraIconEl) cameraIconEl.src = CAMERA_EMOJI_B64;
+
+loadNotices();
 </script>
 
 </body>
