@@ -243,7 +243,7 @@
     height: auto;
     flex-shrink: 0;
     position: absolute;
-    right: 18%;
+    right: 28%;
     top: 50%;
     transform: translate(50%, -50%);
     display: inline-block;
@@ -853,16 +853,15 @@
   </div>
   <div class="screen" id="screen-notice">
     <div class="check-body">
-      <div class="field" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-        <div class="field-label" style="margin-bottom:0;">공지사항</div>
-        <button id="noticeWriteBtn" style="display:none; width:32px; height:32px; border-radius:50%; border:none; background:var(--ink); color:#fff; font-size:20px; line-height:1; cursor:pointer; align-items:center; justify-content:center;">+</button>
+      <div class="field" style="margin-bottom:14px;">
+        <div class="field-label">공지사항</div>
       </div>
       <div id="noticeList"></div>
-      <div style="text-align:center; margin-top:40px;">
-        <span id="logoutBtn" class="logout-link">로그아웃</span>
-      </div>
     </div>
   </div>
+
+  <span id="logoutBtn" class="logout-link" style="position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 14px); left:50%; transform:translateX(-50%); display:none; z-index:49;">로그아웃</span>
+  <button id="noticeWriteBtn" style="display:none; position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 8px); right:calc(12.5% - 20px); width:40px; height:40px; border-radius:50%; border:none; background:var(--ink); color:#fff; font-size:24px; line-height:1; cursor:pointer; align-items:center; justify-content:center; z-index:49;">+</button>
 
   <div class="bottom-nav">
     <button class="nav-btn active" data-screen="in">
@@ -1010,8 +1009,8 @@ async function loadWeather() {
       tempEl.textContent = (temp !== undefined ? Math.round(temp * 10) / 10 : "-") + "°";
 
       tipEl.innerHTML = precip > 0
-        ? "비나 눈이 내리고 있어요.<br>현관에 우산 비닐을 준비해 주세요."
-        : "비나 눈이 온다면<br>현관에 우산 비닐을 준비해 주세요.";
+        ? "비나 눈이 오고 있어요. 우산 비닐을 준비해 주세요."
+        : "비나 눈이 온다면 우산 비닐을 준비해 주세요.";
     } catch (err) {
       console.error(err);
       locEl.textContent = "날씨를 불러오지 못했어요";
@@ -1087,8 +1086,8 @@ function finishLogin() {
   if (nameEl) nameEl.textContent = loggedInStaff;
   const greetingNameEl = document.getElementById("greetingName-in");
   if (greetingNameEl) greetingNameEl.textContent = loggedInStaff;
-  const writeBtn = document.getElementById("noticeWriteBtn");
-  if (writeBtn) writeBtn.style.display = (loggedInStaff === ADMIN_NAME) ? "flex" : "none";
+  const logoutEl = document.getElementById("logoutBtn");
+  if (logoutEl) logoutEl.style.display = "block";
 }
 
 loginSubmitBtn.addEventListener("click", tryLogin);
@@ -1102,6 +1101,9 @@ if (logoutBtnEl) {
     localStorage.removeItem("loggedInStaff");
     loggedInStaff = null;
     loginPinInput.value = "";
+    logoutBtnEl.style.display = "none";
+    const writeBtn = document.getElementById("noticeWriteBtn");
+    if (writeBtn) writeBtn.style.display = "none";
     loginOverlay.classList.remove("hidden");
   });
 }
@@ -1485,7 +1487,7 @@ async function loadNotices() {
 function renderNotices() {
   const listEl = document.getElementById("noticeList");
   if (noticeItems.length === 0) {
-    listEl.innerHTML = `<div class="empty-state"><div class="icon">📢</div>등록된 공지사항이 없어요</div>`;
+    listEl.innerHTML = `<div class="empty-state"><div class="icon">📢</div>등록된 공지사항이 없어요.</div>`;
     return;
   }
   const sorted = [...noticeItems].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -1506,7 +1508,7 @@ function renderNoticesInline() {
   const listEl = document.getElementById("noticeListInline");
   if (!listEl) return;
   if (noticeItems.length === 0) {
-    listEl.innerHTML = `<div style="font-size:13px; color:var(--muted); padding:10px 0;">등록된 공지사항이 없어요</div>`;
+    listEl.innerHTML = `<div style="font-size:13px; color:var(--muted); padding:10px 0;">등록된 공지사항이 없어요.</div>`;
     return;
   }
   const sorted = [...noticeItems].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -1532,6 +1534,10 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
     document.getElementById(`screen-${screenName}`).classList.add("active");
     if (screenName === "checklist") loadChecklist();
     if (screenName === "notice") loadNotices();
+    const writeBtn = document.getElementById("noticeWriteBtn");
+    if (writeBtn && loggedInStaff === ADMIN_NAME) {
+      writeBtn.style.display = screenName === "notice" ? "flex" : "none";
+    }
   });
 });
 
