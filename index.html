@@ -249,11 +249,11 @@
     display: inline-block;
     animation: waveHand 0.6s ease-in-out 2;
   }
-  .greeting-emoji-small { width: 68px; transform: translate(55%, -50%); animation: waveHandSmall 0.6s ease-in-out 2; animation-fill-mode: forwards; }
+  .greeting-emoji-small { width: 68px; transform: translate(-10%, -50%); animation: waveHandSmall 0.6s ease-in-out 2; animation-fill-mode: forwards; }
   @keyframes waveHandSmall {
-    0%, 100% { transform: translate(55%, -50%) rotate(0deg); }
-    25% { transform: translate(55%, -50%) rotate(-8deg); }
-    75% { transform: translate(55%, -50%) rotate(8deg); }
+    0%, 100% { transform: translate(-10%, -50%) rotate(0deg); }
+    25% { transform: translate(-10%, -50%) rotate(-8deg); }
+    75% { transform: translate(-10%, -50%) rotate(8deg); }
   }
   @keyframes waveHand {
     0%, 100% { transform: translate(0, -50%) rotate(0deg); }
@@ -419,7 +419,6 @@
   .submit-btn.in { background: var(--ok); }
   .submit-btn.out { background: var(--accent); color: #fff; }
   .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .checklist-submit-btn { font-size: 14px; }
 
   /* Toast */
   .toast {
@@ -516,31 +515,6 @@
     line-height: 1.6;
   }
   .notice-textarea:focus { outline: none; border-color: var(--accent); }
-  .notice-photo-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 18px;
-    border: 1.5px solid var(--line);
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 12px;
-    color: var(--ink);
-  }
-  .notice-photo-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .notice-photo-preview img {
-    width: 72px;
-    height: 72px;
-    object-fit: cover;
-    border-radius: 10px;
-  }
   .notice-submit-btn {
     width: 100%;
     padding: 14px 0;
@@ -902,11 +876,11 @@
       <div class="field">
         <div class="field-label-wrap">
           <div class="field-label">
-            <span>필수 공유 사진</span>
+            <span>공유사진</span>
             <span class="required-mark">필수</span>
             <span class="photo-count-hint">(최대 10장)</span>
           </div>
-          <div class="field-label-sub">현관 공용 보관대, 현관 분실물 바구니, 로봇청소기<br>커피머신 2대, 공용냉장고, 냉장고 바구니, 매점 진열대</div>
+          <div class="field-label-sub">현관 공용 보관대, 현관 분실물 바구니, 로봇청소기<br>커피머신 2대, 공용냉장고, 냉장고 바구니, 매점 진열대 등</div>
         </div>
         <div class="photo-grid" id="photoGrid">
           <label class="photo-upload-tile" id="photoAddTile">
@@ -979,11 +953,6 @@
       </div>
       <input type="text" class="notice-input" id="noticeTitleInput" placeholder="제목을 입력하세요">
       <textarea class="notice-textarea" id="noticeContentInput" placeholder="내용을 입력하세요..."></textarea>
-      <label class="notice-photo-label">
-        📷 사진 첨부
-        <input type="file" id="noticePhotoInput" accept="image/*" multiple style="display:none">
-      </label>
-      <div class="notice-photo-preview" id="noticePhotoPreview"></div>
       <button class="notice-submit-btn" id="noticeSubmitBtn">등록하기</button>
     </div>
   </div>
@@ -1223,19 +1192,19 @@ function finishLogin() {
 function checkTodayButtons() {
   const today = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
   const btnIn = document.getElementById("submitBtn-in");
-  if (btnIn && localStorage.getItem("checkedIn_" + today)) {
+  if (btnIn && localStorage.getItem("checkedIn_" + loggedInStaff + "_" + today)) {
     btnIn.disabled = true;
     btnIn.textContent = "✓ 출근 완료";
     btnIn.style.background = "var(--ok)";
   }
   const btnOut = document.getElementById("submitBtn-out");
-  if (btnOut && localStorage.getItem("checkedOut_" + today)) {
+  if (btnOut && localStorage.getItem("checkedOut_" + loggedInStaff + "_" + today)) {
     btnOut.disabled = true;
     btnOut.textContent = "✓ 퇴근 완료";
     btnOut.style.background = "#888";
   }
   const btnCl = document.getElementById("checklistSubmitBtn");
-  if (btnCl && localStorage.getItem("checklistDone_" + today)) {
+  if (btnCl && localStorage.getItem("checklistDone_" + loggedInStaff + "_" + today)) {
     btnCl.disabled = true;
     btnCl.textContent = "✓ 제출 완료";
     btnCl.style.background = "var(--ok)";
@@ -1300,7 +1269,7 @@ document.getElementById("submitBtn-in").addEventListener("click", async () => {
     });
     showToast("출근 체크 완료!");
     const todayKey = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
-    localStorage.setItem("checkedIn_" + todayKey, "1");
+    localStorage.setItem("checkedIn_" + loggedInStaff + "_" + todayKey, "1");
     btn.disabled = true;
     btn.textContent = "✓ 출근 완료";
     btn.style.background = "var(--ok)";
@@ -1385,7 +1354,7 @@ renderPhotoGrid();
 document.getElementById("submitBtn-out").addEventListener("click", async () => {
   if (isSubmitting) return;
   if (!loggedInStaff) { showToast("로그인이 필요해요"); return; }
-  if (photoList.length === 0) { showToast("필수 공유 사진을 첨부해주세요"); return; }
+  if (photoList.length === 0) { showToast("공유사진을 첨부해주세요"); return; }
   const lockerNumCheck = document.getElementById("lockerInput-out").value.trim();
   if (!lockerNumCheck) { showToast("미결제 사물함 번호를 입력해주세요"); return; }
 
@@ -1423,7 +1392,7 @@ document.getElementById("submitBtn-out").addEventListener("click", async () => {
     photoList = [];
     renderPhotoGrid();
     const todayKeyOut = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
-    localStorage.setItem("checkedOut_" + todayKeyOut, "1");
+    localStorage.setItem("checkedOut_" + loggedInStaff + "_" + todayKeyOut, "1");
     btn.disabled = true;
     btn.textContent = "✓ 퇴근 완료";
     btn.style.background = "#888";
@@ -1632,7 +1601,7 @@ async function toggleChecklistTask(category, taskText) {
 document.getElementById("checklistSubmitBtn").addEventListener("click", () => {
   showToast("오늘의 체크리스트를 완료했어요!");
   const todayKeyCl = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
-  localStorage.setItem("checklistDone_" + todayKeyCl, "1");
+  localStorage.setItem("checklistDone_" + loggedInStaff + "_" + todayKeyCl, "1");
   const btn = document.getElementById("checklistSubmitBtn");
   btn.disabled = true;
   btn.textContent = "✓ 제출 완료";
@@ -1659,9 +1628,6 @@ function fmtDateOnly(d) {
 }
 
 function noticeCardHtml(n, contentId) {
-  const photosHtml = (n.photos && n.photos.length > 0)
-    ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">${n.photos.map(p => `<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;" onerror="this.style.display='none'">`).join("")}</div>`
-    : "";
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
       <div class="notice-title" style="margin:0;">${escapeHtml(n.title)}</div>
@@ -1669,7 +1635,6 @@ function noticeCardHtml(n, contentId) {
     </div>
     <div id="${contentId}" style="display:none;margin-top:10px;">
       <div class="notice-content">${escapeHtml(n.content)}</div>
-      ${photosHtml}
     </div>
   `;
 }
@@ -1751,36 +1716,18 @@ const noticeModal = document.getElementById("noticeModal");
 const noticeModalClose = document.getElementById("noticeModalClose");
 const noticeTitleInput = document.getElementById("noticeTitleInput");
 const noticeContentInput = document.getElementById("noticeContentInput");
-const noticePhotoInput = document.getElementById("noticePhotoInput");
-const noticePhotoPreview = document.getElementById("noticePhotoPreview");
 const noticeSubmitBtn = document.getElementById("noticeSubmitBtn");
-let noticePhotos = [];
 
 document.getElementById("noticeWriteBtn").addEventListener("click", () => {
   noticeModal.classList.remove("hidden");
   noticeTitleInput.value = "";
   noticeContentInput.value = "";
-  noticePhotoPreview.innerHTML = "";
-  noticePhotos = [];
 });
 
 noticeModalClose.addEventListener("click", () => {
   noticeModal.classList.add("hidden");
 });
 
-noticePhotoInput.addEventListener("change", (e) => {
-  Array.from(e.target.files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      noticePhotos.push(ev.target.result);
-      const img = document.createElement("img");
-      img.src = ev.target.result;
-      noticePhotoPreview.appendChild(img);
-    };
-    reader.readAsDataURL(file);
-  });
-  noticePhotoInput.value = "";
-});
 
 noticeSubmitBtn.addEventListener("click", async () => {
   const title = noticeTitleInput.value.trim();
@@ -1798,8 +1745,7 @@ noticeSubmitBtn.addEventListener("click", async () => {
         title,
         content,
         author: loggedInStaff,
-        timestamp: localTimestamp(now),
-        photos: noticePhotos
+        timestamp: localTimestamp(now)
       })
     });
     noticeModal.classList.add("hidden");
