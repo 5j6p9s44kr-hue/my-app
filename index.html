@@ -1504,8 +1504,7 @@ async function loadChecklist() {
     });
     renderChecklist();
   } catch (err) {
-    console.error(err);
-    showToast("체크 현황을 불러오지 못했어요");
+    console.warn("체크리스트 현황 로드 실패 (오프라인 모드로 계속):", err);
   }
 }
 
