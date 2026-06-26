@@ -887,20 +887,12 @@
 <div class="lightbox" id="lightbox"><img id="lightboxImg"></div>
 
 <script>
-const STAFF_LOGIN = [
-  { name: "김선희", pin: "900101" },
-  { name: "백은혜", pin: "910202" },
-  { name: "이성민", pin: "920303" },
-  { name: "양해영", pin: "930404" },
-  { name: "홍윤희", pin: "940505" },
-];
-const ADMIN_NAME = "박지수";
-const ADMIN_PIN = "950303";
 const BRANCHES = ["이수점"];
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbw8IFxqpCkrOOCwQP8ZvIr8zxNhedLtBk9_mbPe2oY_HcBFYVLsCciLPDXBTNHCfPFh/exec";
 const MAX_PHOTOS = 10;
 
-let loggedInStaff = null; // 로그인된 직원 이름
+let loggedInStaff = null;
+let isAdminUser = false;
 const FIXED_BRANCH = "이수점"; // 지점이 하나뿐이라 고정값으로 사용
 let photoList = [];
 let isSubmitting = false;
@@ -1068,16 +1060,27 @@ const loginSubmitBtn = document.getElementById("loginSubmitBtn");
 
 function tryLogin() {
   const pin = loginPinInput.value.trim();
-  const isAdmin = pin === ADMIN_PIN;
-  const found = isAdmin ? { name: ADMIN_NAME } : STAFF_LOGIN.find(s => s.pin === pin);
-  if (!found) {
-    showToast("아이디를 다시 확인해 주세요.");
-    loginPinInput.value = "";
-    return;
-  }
-  loggedInStaff = found.name;
-  localStorage.setItem("loggedInStaff", found.name);
-  finishLogin();
+  if (!pin) return;
+  loginSubmitBtn.disabled = true;
+  fetchJsonp(SHEET_API_URL + "?kind=login&pin=" + encodeURIComponent(pin))
+    .then(data => {
+      if (data.error || !data.name) {
+        showToast("아이디를 다시 확인해 주세요.");
+        loginPinInput.value = "";
+      } else {
+        loggedInStaff = data.name;
+        isAdminUser = !!data.isAdmin;
+        localStorage.setItem("loggedInStaff", data.name);
+        localStorage.setItem("isAdminUser", isAdminUser ? "1" : "0");
+        finishLogin();
+      }
+    })
+    .catch(() => {
+      showToast("서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    })
+    .finally(() => {
+      loginSubmitBtn.disabled = false;
+    });
 }
 
 function finishLogin() {
@@ -1099,8 +1102,10 @@ const logoutBtnEl = document.getElementById("logoutBtn");
 if (logoutBtnEl) {
   logoutBtnEl.addEventListener("click", () => {
     localStorage.removeItem("loggedInStaff");
+    localStorage.removeItem("isAdminUser");
     loggedInStaff = null;
     loginPinInput.value = "";
+    isAdminUser = false;
     logoutBtnEl.style.display = "none";
     const writeBtn = document.getElementById("noticeWriteBtn");
     if (writeBtn) writeBtn.style.display = "none";
@@ -1110,8 +1115,9 @@ if (logoutBtnEl) {
 
 (function checkSavedLogin() {
   const saved = localStorage.getItem("loggedInStaff");
-  if (saved && STAFF_LOGIN.some(s => s.name === saved)) {
+  if (saved) {
     loggedInStaff = saved;
+    isAdminUser = localStorage.getItem("isAdminUser") === "1";
     finishLogin();
   }
 })();
@@ -1535,7 +1541,7 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
     if (screenName === "checklist") loadChecklist();
     if (screenName === "notice") loadNotices();
     const writeBtn = document.getElementById("noticeWriteBtn");
-    if (writeBtn && loggedInStaff === ADMIN_NAME) {
+    if (writeBtn && isAdminUser) {
       writeBtn.style.display = screenName === "notice" ? "flex" : "none";
     }
   });
