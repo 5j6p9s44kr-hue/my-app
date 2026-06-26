@@ -245,7 +245,7 @@
     position: absolute;
     right: 0;
     top: 50%;
-    transform: translate(20%, -50%);
+    transform: translate(0, -50%);
     display: inline-block;
     animation: waveHand 0.6s ease-in-out 2;
   }
@@ -954,12 +954,10 @@
         <div class="field-label">공지사항</div>
       </div>
       <div id="noticeList"></div>
-      <div style="text-align:center; margin-top:36px; padding-bottom:20px;">
-        <span id="logoutBtn" class="logout-link" style="cursor:pointer; text-decoration:underline; text-underline-offset:3px;">로그아웃</span>
-      </div>
     </div>
   </div>
 
+  <span id="logoutBtn" class="logout-link" style="position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 18px); left:50%; transform:translateX(-50%); display:none; z-index:49; cursor:pointer; text-decoration:underline; text-underline-offset:3px; white-space:nowrap;">로그아웃</span>
   <button id="noticeWriteBtn" style="display:none; position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 24px); right:calc(12.5% - 20px); width:44px; height:44px; border-radius:50%; border:none; background:var(--ink); color:#fff; font-size:24px; line-height:1; cursor:pointer; align-items:center; justify-content:center; z-index:49;">+</button>
 
   <!-- 공지 작성 모달 -->
@@ -1223,6 +1221,8 @@ if (logoutBtnEl) {
     isAdminUser = false;
     const writeBtn = document.getElementById("noticeWriteBtn");
     if (writeBtn) writeBtn.style.display = "none";
+    const logoutBtnEl2 = document.getElementById("logoutBtn");
+    if (logoutBtnEl2) logoutBtnEl2.style.display = "none";
     loginOverlay.classList.remove("hidden");
   });
 }
@@ -1594,7 +1594,7 @@ async function loadNotices() {
   const listEl = document.getElementById("noticeList");
   listEl.innerHTML = '<div class="loading-row">불러오는 중...</div>';
   try {
-    const data = await fetchJsonp(SHEET_API_URL + "?kind=notice");
+    const data = await fetchJsonp(SHEET_API_URL + "?kind=notice&t=" + Date.now());
     noticeItems = (data && data.items) ? data.items : [];
     renderNotices();
     renderNoticesInline();
@@ -1665,6 +1665,10 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
     const writeBtn = document.getElementById("noticeWriteBtn");
     if (writeBtn && isAdminUser) {
       writeBtn.style.display = screenName === "notice" ? "flex" : "none";
+    }
+    const logoutBtnNav = document.getElementById("logoutBtn");
+    if (logoutBtnNav) {
+      logoutBtnNav.style.display = screenName === "notice" ? "block" : "none";
     }
   });
 });
