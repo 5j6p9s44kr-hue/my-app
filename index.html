@@ -243,9 +243,9 @@
     height: auto;
     flex-shrink: 0;
     position: absolute;
-    right: 28%;
+    right: 0;
     top: 50%;
-    transform: translate(50%, -50%);
+    transform: translate(20%, -50%);
     display: inline-block;
     animation: waveHand 0.6s ease-in-out 2;
   }
@@ -419,7 +419,7 @@
   /* Toast */
   .toast {
     position: fixed;
-    top: 20px; left: 50%;
+    top: 76px; left: 50%;
     transform: translateX(-50%) translateY(-20px);
     background: var(--ink);
     color: #fff;
@@ -456,6 +456,98 @@
   .lightbox img { max-width: 100%; max-height: 100%; border-radius: 10px; }
 
   .loading-row { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+
+  /* Notice write modal */
+  .notice-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 300;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .notice-modal.hidden { display: none; }
+  .notice-modal-box {
+    background: #fff;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .notice-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .notice-modal-title { font-size: 16px; font-weight: 700; }
+  .notice-modal-close {
+    background: none; border: none; font-size: 20px;
+    cursor: pointer; color: var(--muted); line-height: 1;
+  }
+  .notice-input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-family: inherit;
+  }
+  .notice-input:focus { outline: none; border-color: var(--accent); }
+  .notice-textarea {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    min-height: 130px;
+    resize: none;
+    margin-bottom: 12px;
+    font-family: inherit;
+    line-height: 1.6;
+  }
+  .notice-textarea:focus { outline: none; border-color: var(--accent); }
+  .notice-photo-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .notice-photo-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .notice-photo-preview img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .notice-submit-btn {
+    width: 100%;
+    padding: 14px 0;
+    border-radius: 999px;
+    border: none;
+    background: var(--ink);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: inherit;
+  }
 
   /* Login overlay */
   .login-overlay {
@@ -538,13 +630,18 @@
     width: 100%;
     max-width: 480px;
     display: flex;
+    justify-content: center;
     background: #fff;
     border-top: 1px solid var(--line);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     z-index: 50;
     padding-bottom: env(safe-area-inset-bottom);
+    padding-left: 8%;
+    padding-right: 8%;
   }
   .nav-btn {
     flex: 1;
+    max-width: 90px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -587,7 +684,7 @@
     gap: 5px;
   }
   .logout-link {
-    font-size: 11px;
+    font-size: 14px;
     color: var(--muted);
     text-decoration: underline;
     cursor: pointer;
@@ -720,7 +817,7 @@
     <img class="login-logo" src="data:image/png;base64,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" alt="concentable">
     <input type="password" class="pw-input login-pw-input" id="loginPinInput" placeholder="STAFF ID" maxlength="6" inputmode="numeric">
     <button type="button" class="pw-btn login-btn" id="loginSubmitBtn">로그인</button>
-    <div class="login-footer">by. staffapp</div>
+    <div class="login-footer">STAFFAPP</div>
   </div>
 </div>
 
@@ -857,11 +954,31 @@
         <div class="field-label">공지사항</div>
       </div>
       <div id="noticeList"></div>
+      <div style="text-align:center; margin-top:36px; padding-bottom:20px;">
+        <span id="logoutBtn" class="logout-link" style="cursor:pointer; text-decoration:underline; text-underline-offset:3px;">로그아웃</span>
+      </div>
     </div>
   </div>
 
-  <span id="logoutBtn" class="logout-link" style="position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 14px); left:50%; transform:translateX(-50%); display:none; z-index:49;">로그아웃</span>
-  <button id="noticeWriteBtn" style="display:none; position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 8px); right:calc(12.5% - 20px); width:40px; height:40px; border-radius:50%; border:none; background:var(--ink); color:#fff; font-size:24px; line-height:1; cursor:pointer; align-items:center; justify-content:center; z-index:49;">+</button>
+  <button id="noticeWriteBtn" style="display:none; position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 24px); right:calc(12.5% - 20px); width:44px; height:44px; border-radius:50%; border:none; background:var(--ink); color:#fff; font-size:24px; line-height:1; cursor:pointer; align-items:center; justify-content:center; z-index:49;">+</button>
+
+  <!-- 공지 작성 모달 -->
+  <div class="notice-modal hidden" id="noticeModal">
+    <div class="notice-modal-box">
+      <div class="notice-modal-header">
+        <span class="notice-modal-title">공지 작성</span>
+        <button class="notice-modal-close" id="noticeModalClose">✕</button>
+      </div>
+      <input type="text" class="notice-input" id="noticeTitleInput" placeholder="제목을 입력하세요">
+      <textarea class="notice-textarea" id="noticeContentInput" placeholder="내용을 입력하세요..."></textarea>
+      <label class="notice-photo-label">
+        📷 사진 첨부
+        <input type="file" id="noticePhotoInput" accept="image/*" multiple style="display:none">
+      </label>
+      <div class="notice-photo-preview" id="noticePhotoPreview"></div>
+      <button class="notice-submit-btn" id="noticeSubmitBtn">등록하기</button>
+    </div>
+  </div>
 
   <div class="bottom-nav">
     <button class="nav-btn active" data-screen="in">
@@ -887,20 +1004,12 @@
 <div class="lightbox" id="lightbox"><img id="lightboxImg"></div>
 
 <script>
-const STAFF_LOGIN = [
-  { name: "김선희", pin: "900101" },
-  { name: "백은혜", pin: "910202" },
-  { name: "이성민", pin: "920303" },
-  { name: "양해영", pin: "930404" },
-  { name: "홍윤희", pin: "940505" },
-];
-const ADMIN_NAME = "박지수";
-const ADMIN_PIN = "950303";
 const BRANCHES = ["이수점"];
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbw8IFxqpCkrOOCwQP8ZvIr8zxNhedLtBk9_mbPe2oY_HcBFYVLsCciLPDXBTNHCfPFh/exec";
 const MAX_PHOTOS = 10;
 
-let loggedInStaff = null; // 로그인된 직원 이름
+let loggedInStaff = null;
+let isAdminUser = false;
 const FIXED_BRANCH = "이수점"; // 지점이 하나뿐이라 고정값으로 사용
 let photoList = [];
 let isSubmitting = false;
@@ -1068,16 +1177,27 @@ const loginSubmitBtn = document.getElementById("loginSubmitBtn");
 
 function tryLogin() {
   const pin = loginPinInput.value.trim();
-  const isAdmin = pin === ADMIN_PIN;
-  const found = isAdmin ? { name: ADMIN_NAME } : STAFF_LOGIN.find(s => s.pin === pin);
-  if (!found) {
-    showToast("아이디를 다시 확인해 주세요.");
-    loginPinInput.value = "";
-    return;
-  }
-  loggedInStaff = found.name;
-  localStorage.setItem("loggedInStaff", found.name);
-  finishLogin();
+  if (!pin) return;
+  loginSubmitBtn.disabled = true;
+  fetchJsonp(SHEET_API_URL + "?kind=login&pin=" + encodeURIComponent(pin))
+    .then(data => {
+      if (data.error || !data.name) {
+        showToast("아이디를 다시 확인해 주세요.");
+        loginPinInput.value = "";
+      } else {
+        loggedInStaff = data.name;
+        isAdminUser = !!data.isAdmin;
+        localStorage.setItem("loggedInStaff", data.name);
+        localStorage.setItem("isAdminUser", isAdminUser ? "1" : "0");
+        finishLogin();
+      }
+    })
+    .catch(() => {
+      showToast("서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    })
+    .finally(() => {
+      loginSubmitBtn.disabled = false;
+    });
 }
 
 function finishLogin() {
@@ -1086,8 +1206,6 @@ function finishLogin() {
   if (nameEl) nameEl.textContent = loggedInStaff;
   const greetingNameEl = document.getElementById("greetingName-in");
   if (greetingNameEl) greetingNameEl.textContent = loggedInStaff;
-  const logoutEl = document.getElementById("logoutBtn");
-  if (logoutEl) logoutEl.style.display = "block";
 }
 
 loginSubmitBtn.addEventListener("click", tryLogin);
@@ -1099,9 +1217,10 @@ const logoutBtnEl = document.getElementById("logoutBtn");
 if (logoutBtnEl) {
   logoutBtnEl.addEventListener("click", () => {
     localStorage.removeItem("loggedInStaff");
+    localStorage.removeItem("isAdminUser");
     loggedInStaff = null;
     loginPinInput.value = "";
-    logoutBtnEl.style.display = "none";
+    isAdminUser = false;
     const writeBtn = document.getElementById("noticeWriteBtn");
     if (writeBtn) writeBtn.style.display = "none";
     loginOverlay.classList.remove("hidden");
@@ -1110,8 +1229,9 @@ if (logoutBtnEl) {
 
 (function checkSavedLogin() {
   const saved = localStorage.getItem("loggedInStaff");
-  if (saved && STAFF_LOGIN.some(s => s.name === saved)) {
+  if (saved) {
     loggedInStaff = saved;
+    isAdminUser = localStorage.getItem("isAdminUser") === "1";
     finishLogin();
   }
 })();
@@ -1492,14 +1612,22 @@ function renderNotices() {
   }
   const sorted = [...noticeItems].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   listEl.innerHTML = "";
-  sorted.forEach(n => {
+  sorted.forEach((n, idx) => {
     const card = document.createElement("div");
     card.className = "notice-card";
+    card.style.cursor = "pointer";
+    const contentId = `notice-content-${idx}`;
     card.innerHTML = `
       <div class="notice-title">${escapeHtml(n.title)}</div>
-      <div class="notice-date">${fmtFull(new Date(n.timestamp))} · ${escapeHtml(n.author || '')}</div>
-      <div class="notice-content">${escapeHtml(n.content)}</div>
+      <div class="notice-date">${fmtFull(new Date(n.timestamp))}</div>
+      <div id="${contentId}" style="display:none; margin-top:10px;">
+        <div class="notice-content">${escapeHtml(n.content)}</div>
+      </div>
     `;
+    card.addEventListener("click", () => {
+      const el = document.getElementById(contentId);
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    });
     listEl.appendChild(card);
   });
 }
@@ -1535,7 +1663,7 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
     if (screenName === "checklist") loadChecklist();
     if (screenName === "notice") loadNotices();
     const writeBtn = document.getElementById("noticeWriteBtn");
-    if (writeBtn && loggedInStaff === ADMIN_NAME) {
+    if (writeBtn && isAdminUser) {
       writeBtn.style.display = screenName === "notice" ? "flex" : "none";
     }
   });
@@ -1547,6 +1675,73 @@ const cameraIconEl = document.getElementById("cameraIcon");
 if (cameraIconEl) cameraIconEl.src = CAMERA_EMOJI_B64;
 
 loadNotices();
+
+// ─── 공지 작성 모달 ───────────────────────────────────────
+const noticeModal = document.getElementById("noticeModal");
+const noticeModalClose = document.getElementById("noticeModalClose");
+const noticeTitleInput = document.getElementById("noticeTitleInput");
+const noticeContentInput = document.getElementById("noticeContentInput");
+const noticePhotoInput = document.getElementById("noticePhotoInput");
+const noticePhotoPreview = document.getElementById("noticePhotoPreview");
+const noticeSubmitBtn = document.getElementById("noticeSubmitBtn");
+let noticePhotos = [];
+
+document.getElementById("noticeWriteBtn").addEventListener("click", () => {
+  noticeModal.classList.remove("hidden");
+  noticeTitleInput.value = "";
+  noticeContentInput.value = "";
+  noticePhotoPreview.innerHTML = "";
+  noticePhotos = [];
+});
+
+noticeModalClose.addEventListener("click", () => {
+  noticeModal.classList.add("hidden");
+});
+
+noticePhotoInput.addEventListener("change", (e) => {
+  Array.from(e.target.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      noticePhotos.push(ev.target.result);
+      const img = document.createElement("img");
+      img.src = ev.target.result;
+      noticePhotoPreview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+  noticePhotoInput.value = "";
+});
+
+noticeSubmitBtn.addEventListener("click", async () => {
+  const title = noticeTitleInput.value.trim();
+  const content = noticeContentInput.value.trim();
+  if (!title) { showToast("제목을 입력해주세요."); return; }
+  if (!content) { showToast("내용을 입력해주세요."); return; }
+  noticeSubmitBtn.disabled = true;
+  noticeSubmitBtn.textContent = "등록 중...";
+  try {
+    const now = new Date();
+    await fetch(SHEET_API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        kind: "notice_add",
+        title,
+        content,
+        author: loggedInStaff,
+        timestamp: now.toISOString(),
+        photos: noticePhotos
+      })
+    });
+    noticeModal.classList.add("hidden");
+    showToast("공지가 등록되었어요!");
+    await loadNotices();
+  } catch (err) {
+    showToast("등록에 실패했어요. 다시 시도해주세요.");
+  } finally {
+    noticeSubmitBtn.disabled = false;
+    noticeSubmitBtn.textContent = "등록하기";
+  }
+});
 </script>
 
 </body>
