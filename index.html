@@ -249,7 +249,13 @@
     display: inline-block;
     animation: waveHand 0.6s ease-in-out 2;
   }
-  .greeting-emoji-small { width: 68px; }
+  .greeting-emoji-small { width: 68px; transform: translate(10%, -50%) !important; }
+  .greeting-emoji-small.animated { animation: waveHandSmall 0.6s ease-in-out 2; }
+  @keyframes waveHandSmall {
+    0%, 100% { transform: translate(10%, -50%) rotate(0deg); }
+    25% { transform: translate(10%, -50%) rotate(-8deg); }
+    75% { transform: translate(10%, -50%) rotate(8deg); }
+  }
   @keyframes waveHand {
     0%, 100% { transform: translate(0, -50%) rotate(0deg); }
     25% { transform: translate(0, -50%) rotate(-8deg); }
@@ -1204,6 +1210,29 @@ function finishLogin() {
   if (nameEl) nameEl.textContent = loggedInStaff;
   const greetingNameEl = document.getElementById("greetingName-in");
   if (greetingNameEl) greetingNameEl.textContent = loggedInStaff;
+  checkTodayButtons();
+}
+
+function checkTodayButtons() {
+  const today = new Date().toISOString().slice(0,10);
+  const btnIn = document.getElementById("submitBtn-in");
+  if (btnIn && localStorage.getItem("checkedIn_" + today)) {
+    btnIn.disabled = true;
+    btnIn.textContent = "✓ 출근 완료";
+    btnIn.style.background = "var(--ok)";
+  }
+  const btnOut = document.getElementById("submitBtn-out");
+  if (btnOut && localStorage.getItem("checkedOut_" + today)) {
+    btnOut.disabled = true;
+    btnOut.textContent = "✓ 퇴근 완료";
+    btnOut.style.background = "#888";
+  }
+  const btnCl = document.getElementById("checklistSubmitBtn");
+  if (btnCl && localStorage.getItem("checklistDone_" + today)) {
+    btnCl.disabled = true;
+    btnCl.textContent = "✓ 제출 완료";
+    btnCl.style.background = "var(--ok)";
+  }
 }
 
 loginSubmitBtn.addEventListener("click", tryLogin);
@@ -1263,10 +1292,15 @@ document.getElementById("submitBtn-in").addEventListener("click", async () => {
       body: JSON.stringify(record),
     });
     showToast("출근 체크 완료!");
+    const todayKey = new Date().toISOString().slice(0,10);
+    localStorage.setItem("checkedIn_" + todayKey, "1");
+    btn.disabled = true;
+    btn.textContent = "✓ 출근 완료";
+    btn.style.background = "var(--ok)";
+    isSubmitting = false;
   } catch (err) {
     console.error(err);
     showToast("저장 중 문제가 생겼어요. 다시 시도해주세요");
-  } finally {
     isSubmitting = false;
     btn.disabled = false;
     btn.textContent = "출근하기";
@@ -1381,13 +1415,18 @@ document.getElementById("submitBtn-out").addEventListener("click", async () => {
     document.getElementById("supplyRequestInput-out").value = "";
     photoList = [];
     renderPhotoGrid();
+    const todayKeyOut = new Date().toISOString().slice(0,10);
+    localStorage.setItem("checkedOut_" + todayKeyOut, "1");
+    btn.disabled = true;
+    btn.textContent = "✓ 퇴근 완료";
+    btn.style.background = "#888";
+    isSubmitting = false;
   } catch (err) {
     console.error(err);
     showToast("저장 중 문제가 생겼어요. 다시 시도해주세요");
-  } finally {
     isSubmitting = false;
     btn.disabled = false;
-    btn.textContent = "퇴근 체크 완료";
+    btn.textContent = "퇴근하기";
   }
 });
 
@@ -1585,6 +1624,12 @@ async function toggleChecklistTask(category, taskText) {
 
 document.getElementById("checklistSubmitBtn").addEventListener("click", () => {
   showToast("오늘의 체크리스트를 완료했어요!");
+  const todayKeyCl = new Date().toISOString().slice(0,10);
+  localStorage.setItem("checklistDone_" + todayKeyCl, "1");
+  const btn = document.getElementById("checklistSubmitBtn");
+  btn.disabled = true;
+  btn.textContent = "✓ 제출 완료";
+  btn.style.background = "var(--ok)";
 });
 
 async function loadNotices() {
@@ -1601,6 +1646,22 @@ async function loadNotices() {
   }
 }
 
+function noticeCardHtml(n, contentId) {
+  const photosHtml = (n.photos && n.photos.length > 0)
+    ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">${n.photos.map(p => `<img src="${escapeHtml(p)}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;">`).join("")}</div>`
+    : "";
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div class="notice-date" style="margin:0;flex-shrink:0;">${fmtFull(new Date(n.timestamp))}</div>
+      <div class="notice-title" style="margin:0;text-align:right;">${escapeHtml(n.title)}</div>
+    </div>
+    <div id="${contentId}" style="display:none;margin-top:10px;">
+      <div class="notice-content">${escapeHtml(n.content)}</div>
+      ${photosHtml}
+    </div>
+  `;
+}
+
 function renderNotices() {
   const listEl = document.getElementById("noticeList");
   if (noticeItems.length === 0) {
@@ -1614,13 +1675,7 @@ function renderNotices() {
     card.className = "notice-card";
     card.style.cursor = "pointer";
     const contentId = `notice-content-${idx}`;
-    card.innerHTML = `
-      <div class="notice-title">${escapeHtml(n.title)}</div>
-      <div class="notice-date">${fmtFull(new Date(n.timestamp))}</div>
-      <div id="${contentId}" style="display:none; margin-top:10px;">
-        <div class="notice-content">${escapeHtml(n.content)}</div>
-      </div>
-    `;
+    card.innerHTML = noticeCardHtml(n, contentId);
     card.addEventListener("click", () => {
       const el = document.getElementById(contentId);
       el.style.display = el.style.display === "none" ? "block" : "none";
@@ -1643,13 +1698,7 @@ function renderNoticesInline() {
     card.className = "notice-card";
     card.style.cursor = "pointer";
     const inlineContentId = `notice-inline-content-${idx}`;
-    card.innerHTML = `
-      <div class="notice-title">${escapeHtml(n.title)}</div>
-      <div class="notice-date">${fmtFull(new Date(n.timestamp))}</div>
-      <div id="${inlineContentId}" style="display:none; margin-top:10px;">
-        <div class="notice-content">${escapeHtml(n.content)}</div>
-      </div>
-    `;
+    card.innerHTML = noticeCardHtml(n, inlineContentId);
     card.addEventListener("click", () => {
       const el = document.getElementById(inlineContentId);
       el.style.display = el.style.display === "none" ? "block" : "none";
