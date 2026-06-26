@@ -600,6 +600,11 @@
   }
   .login-btn {
     width: 220px;
+    transition: opacity 0.1s, transform 0.1s;
+  }
+  .login-btn:active {
+    opacity: 0.75;
+    transform: scale(0.97);
   }
   .login-footer {
     font-size: 12px;
@@ -1173,6 +1178,7 @@ function tryLogin() {
   const pin = loginPinInput.value.trim();
   if (!pin) return;
   loginSubmitBtn.disabled = true;
+  loginSubmitBtn.textContent = "확인 중...";
   fetchJsonp(SHEET_API_URL + "?kind=login&pin=" + encodeURIComponent(pin))
     .then(data => {
       if (data.error || !data.name) {
@@ -1192,6 +1198,7 @@ function tryLogin() {
     })
     .finally(() => {
       loginSubmitBtn.disabled = false;
+      loginSubmitBtn.textContent = "로그인";
     });
 }
 
