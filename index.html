@@ -251,9 +251,9 @@
   }
   .greeting-emoji-small { width: 68px; }
   @keyframes waveHand {
-    0%, 100% { transform: translate(50%, -50%) rotate(0deg); }
-    25% { transform: translate(50%, -50%) rotate(-8deg); }
-    75% { transform: translate(50%, -50%) rotate(8deg); }
+    0%, 100% { transform: translate(0, -50%) rotate(0deg); }
+    25% { transform: translate(0, -50%) rotate(-8deg); }
+    75% { transform: translate(0, -50%) rotate(8deg); }
   }
 
   /* 시각/지점명 2단 박스 (왼쪽 정렬) */
@@ -1357,17 +1357,14 @@ document.getElementById("submitBtn-out").addEventListener("click", async () => {
   const lockerNum = document.getElementById("lockerInput-out").value.trim();
   const supplyText = document.getElementById("supplyRequestInput-out").value.trim();
   const noteText = document.getElementById("noteInput-out").value.trim();
-  const noteParts = [];
-  noteParts.push(`[미결제 사물함: ${lockerNum}]`);
-  if (supplyText) noteParts.push(`[비품요청: ${supplyText}]`);
-  if (noteText) noteParts.push(noteText);
-  const combinedNote = noteParts.join(" ").trim();
   const record = {
     kind: "attendance",
     type: "out",
     staff: loggedInStaff,
     branch: FIXED_BRANCH,
-    note: combinedNote,
+    locker: lockerNum,
+    supply: supplyText,
+    note: noteText,
     photos: photoList,
     timestamp: now.toISOString(),
   };
@@ -1641,14 +1638,22 @@ function renderNoticesInline() {
   }
   const sorted = [...noticeItems].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   listEl.innerHTML = "";
-  sorted.forEach(n => {
+  sorted.forEach((n, idx) => {
     const card = document.createElement("div");
     card.className = "notice-card";
+    card.style.cursor = "pointer";
+    const inlineContentId = `notice-inline-content-${idx}`;
     card.innerHTML = `
       <div class="notice-title">${escapeHtml(n.title)}</div>
-      <div class="notice-date">${fmtFull(new Date(n.timestamp))} · ${escapeHtml(n.author || '')}</div>
-      <div class="notice-content">${escapeHtml(n.content)}</div>
+      <div class="notice-date">${fmtFull(new Date(n.timestamp))}</div>
+      <div id="${inlineContentId}" style="display:none; margin-top:10px;">
+        <div class="notice-content">${escapeHtml(n.content)}</div>
+      </div>
     `;
+    card.addEventListener("click", () => {
+      const el = document.getElementById(inlineContentId);
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    });
     listEl.appendChild(card);
   });
 }
