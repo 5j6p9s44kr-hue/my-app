@@ -1204,23 +1204,44 @@ function finishLogin() {
 
 function checkTodayButtons() {
   const today = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
+
   const btnIn = document.getElementById("submitBtn-in");
-  if (btnIn && localStorage.getItem("checkedIn_" + loggedInStaff + "_" + today)) {
-    btnIn.disabled = true;
-    btnIn.textContent = "✓ 출근 완료";
-    btnIn.style.background = "var(--ok)";
+  if (btnIn) {
+    if (localStorage.getItem("checkedIn_" + loggedInStaff + "_" + today)) {
+      btnIn.disabled = true;
+      btnIn.textContent = "✓ 출근 완료";
+      btnIn.style.background = "var(--ok)";
+    } else {
+      btnIn.disabled = false;
+      btnIn.textContent = "출근하기";
+      btnIn.style.background = "";
+    }
   }
+
   const btnOut = document.getElementById("submitBtn-out");
-  if (btnOut && localStorage.getItem("checkedOut_" + loggedInStaff + "_" + today)) {
-    btnOut.disabled = true;
-    btnOut.textContent = "✓ 퇴근 완료";
-    btnOut.style.background = "#888";
+  if (btnOut) {
+    if (localStorage.getItem("checkedOut_" + loggedInStaff + "_" + today)) {
+      btnOut.disabled = true;
+      btnOut.textContent = "✓ 퇴근 완료";
+      btnOut.style.background = "#888";
+    } else {
+      btnOut.disabled = false;
+      btnOut.textContent = "퇴근하기";
+      btnOut.style.background = "";
+    }
   }
+
   const btnCl = document.getElementById("checklistSubmitBtn");
-  if (btnCl && localStorage.getItem("checklistDone_" + loggedInStaff + "_" + today)) {
-    btnCl.disabled = true;
-    btnCl.textContent = "✓ 제출 완료";
-    btnCl.style.background = "var(--ok)";
+  if (btnCl) {
+    if (localStorage.getItem("checklistDone_" + loggedInStaff + "_" + today)) {
+      btnCl.disabled = true;
+      btnCl.textContent = "✓ 제출 완료";
+      btnCl.style.background = "var(--ok)";
+    } else {
+      btnCl.disabled = false;
+      btnCl.textContent = "제출";
+      btnCl.style.background = "";
+    }
   }
 }
 
