@@ -249,11 +249,11 @@
     display: inline-block;
     animation: waveHand 0.6s ease-in-out 2;
   }
-  .greeting-emoji-small { width: 68px; transform: translate(30%, -50%); animation: waveHandSmall 0.6s ease-in-out 2; animation-fill-mode: forwards; }
+  .greeting-emoji-small { width: 68px; transform: translate(55%, -50%); animation: waveHandSmall 0.6s ease-in-out 2; animation-fill-mode: forwards; }
   @keyframes waveHandSmall {
-    0%, 100% { transform: translate(30%, -50%) rotate(0deg); }
-    25% { transform: translate(30%, -50%) rotate(-8deg); }
-    75% { transform: translate(30%, -50%) rotate(8deg); }
+    0%, 100% { transform: translate(55%, -50%) rotate(0deg); }
+    25% { transform: translate(55%, -50%) rotate(-8deg); }
+    75% { transform: translate(55%, -50%) rotate(8deg); }
   }
   @keyframes waveHand {
     0%, 100% { transform: translate(0, -50%) rotate(0deg); }
@@ -947,9 +947,8 @@
           <div class="checklist-summary-num" id="checklistDoneCount">0/0</div>
           <div class="checklist-summary-label">오늘 완료된 업무</div>
         </div>
-        <a href="https://dashboard.yamoo.ai.kr/snack/manage/expiry?store=19&token=juxc-g0sa3Afkg" target="_blank" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:0.5px solid var(--line);border-radius:14px;padding:18px 10px;text-decoration:none;gap:4px;">
-          <span style="font-size:20px;">🏪</span>
-          <span style="font-size:12px;font-weight:700;color:var(--ink);text-align:center;line-height:1.3;">매점 대시보드<br>바로가기</span>
+        <a href="https://dashboard.yamoo.ai.kr/snack/manage/expiry?store=19&token=juxc-g0sa3Afkg" target="_blank" class="checklist-summary" style="flex:1;margin-bottom:0;display:flex;align-items:center;justify-content:center;text-decoration:none;">
+          <span style="font-size:12.5px;font-weight:700;color:var(--ink);text-align:center;line-height:1.5;">매점 대시보드<br>바로가기</span>
         </a>
       </div>
       <div id="checklistCategories" style="padding-bottom: 30px;"></div>
@@ -1025,6 +1024,9 @@ let isSubmitting = false;
 let noticeItems = [];
 
 function pad(n) { return n.toString().padStart(2, "0"); }
+function localTimestamp(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
 
 function fmtTime(d) {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -1219,7 +1221,7 @@ function finishLogin() {
 }
 
 function checkTodayButtons() {
-  const today = new Date().toISOString().slice(0,10);
+  const today = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
   const btnIn = document.getElementById("submitBtn-in");
   if (btnIn && localStorage.getItem("checkedIn_" + today)) {
     btnIn.disabled = true;
@@ -1287,7 +1289,7 @@ document.getElementById("submitBtn-in").addEventListener("click", async () => {
     branch: FIXED_BRANCH,
     note: "",
     photos: [],
-    timestamp: now.toISOString(),
+    timestamp: localTimestamp(now),
   };
 
   try {
@@ -1297,7 +1299,7 @@ document.getElementById("submitBtn-in").addEventListener("click", async () => {
       body: JSON.stringify(record),
     });
     showToast("출근 체크 완료!");
-    const todayKey = new Date().toISOString().slice(0,10);
+    const todayKey = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
     localStorage.setItem("checkedIn_" + todayKey, "1");
     btn.disabled = true;
     btn.textContent = "✓ 출근 완료";
@@ -1405,7 +1407,7 @@ document.getElementById("submitBtn-out").addEventListener("click", async () => {
     supply: supplyText,
     note: noteText,
     photos: photoList,
-    timestamp: now.toISOString(),
+    timestamp: localTimestamp(now),
   };
 
   try {
@@ -1420,7 +1422,7 @@ document.getElementById("submitBtn-out").addEventListener("click", async () => {
     document.getElementById("supplyRequestInput-out").value = "";
     photoList = [];
     renderPhotoGrid();
-    const todayKeyOut = new Date().toISOString().slice(0,10);
+    const todayKeyOut = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
     localStorage.setItem("checkedOut_" + todayKeyOut, "1");
     btn.disabled = true;
     btn.textContent = "✓ 퇴근 완료";
@@ -1629,7 +1631,7 @@ async function toggleChecklistTask(category, taskText) {
 
 document.getElementById("checklistSubmitBtn").addEventListener("click", () => {
   showToast("오늘의 체크리스트를 완료했어요!");
-  const todayKeyCl = new Date().toISOString().slice(0,10);
+  const todayKeyCl = `${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}-${pad(new Date().getDate())}`;
   localStorage.setItem("checklistDone_" + todayKeyCl, "1");
   const btn = document.getElementById("checklistSubmitBtn");
   btn.disabled = true;
@@ -1658,7 +1660,7 @@ function fmtDateOnly(d) {
 
 function noticeCardHtml(n, contentId) {
   const photosHtml = (n.photos && n.photos.length > 0)
-    ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">${n.photos.map(p => `<img src="${p.replace('drive.google.com/uc?id=','drive.google.com/thumbnail?id=').replace(/(&sz=\w+)?$/, '&sz=w400')}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;" crossorigin="anonymous">`).join("")}</div>`
+    ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">${n.photos.map(p => `<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;" onerror="this.style.display='none'">`).join("")}</div>`
     : "";
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -1796,7 +1798,7 @@ noticeSubmitBtn.addEventListener("click", async () => {
         title,
         content,
         author: loggedInStaff,
-        timestamp: now.toISOString(),
+        timestamp: localTimestamp(now),
         photos: noticePhotos
       })
     });
