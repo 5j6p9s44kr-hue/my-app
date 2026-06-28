@@ -1009,6 +1009,39 @@ let sessionToken = null;
 function getToken() {
   return sessionToken || localStorage.getItem("sessionToken");
 }
+
+function forceLogout(msg) {
+  localStorage.removeItem("loggedInStaff");
+  localStorage.removeItem("isAdminUser");
+  localStorage.removeItem("sessionToken");
+  sessionToken = null;
+  loggedInStaff = null;
+  isAdminUser = false;
+  const writeBtn = document.getElementById("noticeWriteBtn");
+  if (writeBtn) writeBtn.style.display = "none";
+  const logoutBtnEl = document.getElementById("logoutBtn");
+  if (logoutBtnEl) logoutBtnEl.style.display = "none";
+  const loginPinInput = document.getElementById("loginPinInput");
+  if (loginPinInput) loginPinInput.value = "";
+  const loginOverlay = document.getElementById("loginOverlay");
+  if (loginOverlay) loginOverlay.classList.remove("hidden");
+  if (msg) showToast(msg, 4000);
+}
+
+async function checkAuthBeforeWrite() {
+  const token = getToken();
+  if (!token) { forceLogout("로그인이 만료되었습니다. 다시 로그인해 주세요."); return false; }
+  try {
+    const data = await fetchJsonp(SHEET_API_URL + "?kind=validate&token=" + encodeURIComponent(token));
+    if (!data.ok) {
+      forceLogout("로그인이 만료되었습니다. 다시 로그인해 주세요.");
+      return false;
+    }
+    return true;
+  } catch(e) {
+    return true; // 네트워크 오류 시 서버에서 차단하므로 통과
+  }
+}
 const FIXED_BRANCH = "이수점"; // 지점이 하나뿐이라 고정값으로 사용
 let photoList = [];
 let isSubmitting = false;
@@ -1134,11 +1167,11 @@ async function loadWeather() {
 }
 loadWeather();
 
-function showToast(msg) {
+function showToast(msg, duration = 2200) {
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2200);
+  setTimeout(() => t.classList.remove("show"), duration);
 }
 
 function fetchJsonp(url, timeoutMs = 10000) {
@@ -1356,6 +1389,7 @@ if (logoutBtnEl) {
 document.getElementById("submitBtn-in").addEventListener("click", async () => {
   if (isSubmitting) return;
   if (!loggedInStaff) { showToast("로그인이 필요해요"); return; }
+  if (!await checkAuthBeforeWrite()) return;
 
   const btn = document.getElementById("submitBtn-in");
   isSubmitting = true;
@@ -1466,6 +1500,7 @@ renderPhotoGrid();
 document.getElementById("submitBtn-out").addEventListener("click", async () => {
   if (isSubmitting) return;
   if (!loggedInStaff) { showToast("로그인이 필요해요"); return; }
+  if (!await checkAuthBeforeWrite()) return;
   if (photoList.length === 0) { showToast("공유사진을 첨부해주세요"); return; }
   const lockerNumCheck = document.getElementById("lockerInput-out").value.trim();
   if (!lockerNumCheck) { showToast("미결제 사물함 번호를 입력해주세요"); return; }
@@ -1679,6 +1714,7 @@ function renderChecklist() {
 
 async function toggleChecklistTask(category, taskText) {
   if (!loggedInStaff) { showToast("로그인이 필요해요"); return; }
+  if (!await checkAuthBeforeWrite()) return;
   const key = taskKey(category, taskText);
   const newDone = !checkedTasksToday[key];
   checkedTasksToday[key] = newDone;
@@ -1831,6 +1867,7 @@ noticeSubmitBtn.addEventListener("click", async () => {
   const content = noticeContentInput.value.trim();
   if (!title) { showToast("제목을 입력해주세요."); return; }
   if (!content) { showToast("내용을 입력해주세요."); return; }
+  if (!await checkAuthBeforeWrite()) return;
   noticeSubmitBtn.disabled = true;
   noticeSubmitBtn.textContent = "등록 중...";
   try {
