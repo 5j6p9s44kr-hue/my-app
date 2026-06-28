@@ -222,8 +222,8 @@
 
   /* 인사말 박스 */
   .greeting-box {
-    margin-top: 56px;
-    margin-bottom: 50px;
+    margin-top: 28px;
+    margin-bottom: 28px;
   }
   .greeting-row {
     display: flex;
@@ -628,6 +628,7 @@
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: 8%;
     padding-right: 8%;
+    margin-bottom: 10px;
   }
   .nav-btn {
     flex: 1;
@@ -636,7 +637,7 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    padding: 12px 0 14px;
+    padding: 8px 0 10px;
     border: none;
     background: none;
     cursor: pointer;
@@ -889,11 +890,11 @@
       <div class="field">
         <div class="field-label-wrap">
           <div class="field-label">
-            <span>공유사진</span>
+            <span>공유 사진</span>
             <span class="required-mark">필수</span>
             <span class="photo-count-hint">(최대 10장)</span>
           </div>
-          <div class="field-label-sub">현관 공용 보관대, 현관 분실물 바구니, 로봇청소기<br>커피머신 2대, 공용냉장고, 냉장고 바구니, 매점 진열대 등</div>
+          <div class="field-label-sub">현관 공용 보관대, 현관 분실물 바구니, 로봇청소기<br>커피 머신 2대, 공용 냉장고, 냉장고 바구니, 매점 진열대 등</div>
         </div>
         <div class="photo-grid" id="photoGrid">
           <label class="photo-upload-tile" id="photoAddTile">
@@ -912,13 +913,13 @@
       </div>
 
       <div class="field" style="margin-bottom: 20px;">
-        <div class="field-label">비품요청 <span style="color:var(--muted); font-weight:500; font-size:12px;">선택</span></div>
-        <input type="text" class="note-input mode-out" id="supplyRequestInput-out" placeholder="주문이 필요한 소모품을 적어주세요">
+        <div class="field-label">비품 요청 <span style="color:var(--muted); font-weight:500; font-size:12px;">선택</span></div>
+        <input type="text" class="note-input mode-out" id="supplyRequestInput-out" placeholder="주문이 필요한 소모품을 적어주세요.">
       </div>
 
       <div class="field" style="margin-bottom: 30px;">
-        <div class="field-label">특이사항 <span style="color:var(--muted); font-weight:500; font-size:12px;">선택</span></div>
-        <input type="text" class="note-input mode-out" id="noteInput-out" placeholder="전달할 내용이 있으면 적어주세요">
+        <div class="field-label">특이 사항 <span style="color:var(--muted); font-weight:500; font-size:12px;">선택</span></div>
+        <input type="text" class="note-input mode-out" id="noteInput-out" placeholder="전달할 내용이 있으면 적어주세요.">
       </div>
 
     </div>
@@ -935,7 +936,7 @@
           <div class="checklist-summary-label">오늘 완료된 업무</div>
         </div>
         <a href="https://dashboard.yamoo.ai.kr/snack/manage/expiry?store=19&token=juxc-g0sa3Afkg" target="_blank" class="checklist-summary" style="flex:1;margin-bottom:0;display:flex;align-items:center;justify-content:center;text-decoration:none;background:#ffffff;">
-          <span style="font-size:12.5px;font-weight:700;color:var(--ink);text-align:center;line-height:1.5;">매점 대시보드<br>바로가기</span>
+          <span style="font-size:15px;font-weight:700;color:var(--ink);text-align:center;line-height:1.5;">매점 대시보드<br>바로가기</span>
         </a>
       </div>
       <div id="checklistCategories" style="padding-bottom: 30px;"></div>
@@ -955,7 +956,7 @@
   </div>
 
   <span id="logoutBtn" class="logout-link" style="position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 18px); left:50%; transform:translateX(-50%); display:none; z-index:49; cursor:pointer; text-decoration:underline; text-underline-offset:3px; white-space:nowrap;">로그아웃</span>
-  <button id="refreshBtn" style="display:none; position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 16px); left:calc(12.5% - 20px); width:44px; height:44px; border-radius:50%; border:none; background:#FFC000; color:#fff; font-size:20px; line-height:1; cursor:pointer; align-items:center; justify-content:center; z-index:49;">↻</button>
+  <button id="refreshBtn" style="display:none; position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 16px); left:calc(12.5% - 20px); width:44px; height:44px; border-radius:50%; border:none; background:#FFC000; color:#fff; font-size:20px; line-height:1; cursor:pointer; align-items:center; justify-content:center; z-index:49;">↺</button>
   <button id="noticeWriteBtn" style="display:none; position:fixed; bottom:calc(60px + env(safe-area-inset-bottom) + 16px); right:calc(12.5% - 20px); width:44px; height:44px; border-radius:50%; border:none; background:var(--ink); color:#fff; font-size:24px; line-height:1; cursor:pointer; align-items:center; justify-content:center; z-index:49;">+</button>
 
   <!-- 공지 작성 모달 -->
@@ -1512,43 +1513,43 @@ const CHECKLIST_MASTER = [
     "테이블 청소",
     "무선 청소기 바닥 청소",
     "물걸레 청소 (로비, 다이닝, 푸드존)",
-    "스터디룸 청소 (칠판닦기, 의자 정리 포함)",
+    "스터디룸 청소 (칠판 닦기, 의자 정리 포함)",
     "로봇 청소기 (청소 마무리 후 충전)",
-    "로비 공용 물품 정리 (담요 등)",
+    "로비 공용 물품 정리 (담요, 독서대, 휴대폰 충전기 등)",
   ]},
-  { category: "커피머신 관리", icon: CHECKLIST_ICONS.coffee, iconScale: 0.85, items: [
-    "원두 보충",
-    "브로맥 및 물통 세척",
+  { category: "커피 머신 관리", icon: CHECKLIST_ICONS.coffee, iconScale: 0.85, items: [
+    "원두 보충 (마일드, 예가체프)",
+    "브로멕 및 물통 세척",
     "커피 찌꺼기 폐기 및 통 세척",
-    "커피머신 2대 정상 작동 확인",
+    "세척 후 커피 머신 2대 정상 작동 확인",
   ]},
   { category: "다이닝 관리", icon: CHECKLIST_ICONS.onigiri, iconScale: 0.85, items: [
     "공유컵 세척",
-    "하수구 음식물 쓰레기 처리",
+    "하수구 음식물 쓰레기 정리",
     "싱크대 내부 및 주변 청소",
-    "냉장고 임시 보관/나눔 바구니 관리",
+    "냉장고 임시 보관 바구니 / 나눔 바구니 관리",
   ]},
   { category: "푸드존 관리", icon: CHECKLIST_ICONS.bento, iconScale: 0.8, items: [
     "공용 식기 세척",
-    "전자레인지 유리 세척",
-    "하수구 음식물 쓰레기 처리",
+    "전자레인지 유리판 세척",
+    "하수구 음식물 쓰레기 정리",
     "싱크대 내부 및 주변 청소",
-    "음식물 배출 후 쓰레기통 세척",
+    "음식물 쓰레기 배출 후 음식물 쓰레기통 세척",
   ]},
   { category: "미니 매점", icon: CHECKLIST_ICONS.drink, iconScale: 1, items: [
     "식품 입고 시 유통기한 입력",
-    "유통기한 만료 식품 확인",
+    "유통기한 만료 식품 확인 및 처리",
     "매대 진열 관리",
-    "A4 용지 보충",
+    "A4 용지 보충 (11개 이하 시 보충)",
   ]},
   { category: "소모품 관리", icon: CHECKLIST_ICONS.tissue, iconScale: 0.8, items: [
     "냅킨 보충 (다이닝, 푸드존)",
-    "핸드타올 보충 (다이닝)",
+    "핸드타월 보충 (다이닝)",
     "캔디 보충 (현관)",
   ]},
   { category: "쓰레기 배출", icon: CHECKLIST_ICONS.trash, iconScale: 0.8, items: [
     "분리수거 배출",
-    "일반쓰레기 배출",
+    "일반 쓰레기 배출",
     "음식물 쓰레기 배출",
   ]},
   { category: "월요일 고정 업무", icon: CHECKLIST_ICONS.bento, iconScale: 0.8, items: [
