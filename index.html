@@ -1004,6 +1004,11 @@ const MAX_PHOTOS = 10;
 
 let loggedInStaff = null;
 let isAdminUser = false;
+let sessionToken = null;
+
+function getToken() {
+  return sessionToken || localStorage.getItem("sessionToken");
+}
 const FIXED_BRANCH = "이수점"; // 지점이 하나뿐이라 고정값으로 사용
 let photoList = [];
 let isSubmitting = false;
@@ -1191,8 +1196,10 @@ function tryLogin() {
       } else {
         loggedInStaff = data.name;
         isAdminUser = !!data.isAdmin;
+        sessionToken = data.token || null;
         localStorage.setItem("loggedInStaff", data.name);
         localStorage.setItem("isAdminUser", isAdminUser ? "1" : "0");
+        if (data.token) localStorage.setItem("sessionToken", data.token);
         finishLogin();
       }
     })
@@ -1323,6 +1330,8 @@ if (logoutBtnEl) {
   logoutBtnEl.addEventListener("click", () => {
     localStorage.removeItem("loggedInStaff");
     localStorage.removeItem("isAdminUser");
+    localStorage.removeItem("sessionToken");
+    sessionToken = null;
     loggedInStaff = null;
     loginPinInput.value = "";
     isAdminUser = false;
@@ -1339,6 +1348,7 @@ if (logoutBtnEl) {
   if (saved) {
     loggedInStaff = saved;
     isAdminUser = localStorage.getItem("isAdminUser") === "1";
+    sessionToken = localStorage.getItem("sessionToken");
     finishLogin();
   }
 })();
@@ -1360,6 +1370,7 @@ document.getElementById("submitBtn-in").addEventListener("click", async () => {
     branch: FIXED_BRANCH,
     note: "",
     timestamp: localTimestamp(now),
+    token: getToken(),
   };
 
   try {
@@ -1477,6 +1488,7 @@ document.getElementById("submitBtn-out").addEventListener("click", async () => {
     supply: supplyText,
     note: noteText,
     timestamp: localTimestamp(now),
+    token: getToken(),
   };
 
   try {
@@ -1688,6 +1700,7 @@ async function toggleChecklistTask(category, taskText) {
         category: category,
         task: taskText,
         done: newDone,
+        token: getToken(),
       }),
     });
   } catch (err) {
@@ -1829,7 +1842,8 @@ noticeSubmitBtn.addEventListener("click", async () => {
         title,
         content,
         author: loggedInStaff,
-        timestamp: localTimestamp(now)
+        timestamp: localTimestamp(now),
+        token: getToken(),
       })
     });
     noticeModal.classList.add("hidden");
