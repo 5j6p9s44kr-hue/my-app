@@ -1112,7 +1112,7 @@ async function loadWeather() {
 
       tipEl.innerHTML = precip > 0
         ? "비나 눈이 오고 있어요. 우산 비닐을 준비해 주세요."
-        : "비나 눈이 온다면 우산 비닐을 준비해 주세요.";
+        : "비나 눈이 오면 우산 비닐을 준비해 주세요.";
     } catch (err) {
       console.error(err);
       locEl.textContent = "날씨를 불러오지 못했어요";
@@ -1202,6 +1202,22 @@ function tryLogin() {
     });
 }
 
+function navigateTo(screenName) {
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const targetBtn = document.querySelector(`.nav-btn[data-screen="${screenName}"]`);
+  if (targetBtn) targetBtn.classList.add("active");
+  const targetScreen = document.getElementById(`screen-${screenName}`);
+  if (targetScreen) targetScreen.classList.add("active");
+  window.scrollTo(0, 0);
+  const writeBtn = document.getElementById("noticeWriteBtn");
+  if (writeBtn && isAdminUser) writeBtn.style.display = screenName === "notice" ? "flex" : "none";
+  const logoutBtnNav = document.getElementById("logoutBtn");
+  if (logoutBtnNav) logoutBtnNav.style.display = screenName === "notice" ? "block" : "none";
+  if (screenName === "checklist") loadChecklist();
+  if (screenName === "notice") loadNotices();
+}
+
 function finishLogin() {
   loginOverlay.classList.add("hidden");
   const nameEl = document.getElementById("loggedInName");
@@ -1214,6 +1230,7 @@ function finishLogin() {
     void emojiEl.offsetWidth;
     emojiEl.style.animation = "waveHand 0.6s ease-in-out 2";
   }
+  navigateTo("in");
   checkTodayButtons();
 }
 
@@ -1734,21 +1751,7 @@ function renderNoticesInline() {
 
 document.querySelectorAll(".nav-btn").forEach(btn => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    btn.classList.add("active");
-    const screenName = btn.dataset.screen;
-    document.getElementById(`screen-${screenName}`).classList.add("active");
-    if (screenName === "checklist") loadChecklist();
-    if (screenName === "notice") loadNotices();
-    const writeBtn = document.getElementById("noticeWriteBtn");
-    if (writeBtn && isAdminUser) {
-      writeBtn.style.display = screenName === "notice" ? "flex" : "none";
-    }
-    const logoutBtnNav = document.getElementById("logoutBtn");
-    if (logoutBtnNav) {
-      logoutBtnNav.style.display = screenName === "notice" ? "block" : "none";
-    }
+    navigateTo(btn.dataset.screen);
   });
 });
 
