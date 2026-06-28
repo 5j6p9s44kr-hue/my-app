@@ -223,7 +223,7 @@
   /* 인사말 박스 */
   .greeting-box {
     margin-top: 28px;
-    margin-bottom: 28px;
+    margin-bottom: 40px;
   }
   .greeting-row {
     display: flex;
@@ -623,12 +623,13 @@
     justify-content: center;
     background: #fff;
     border-top: 1px solid var(--line);
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
     z-index: 50;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: 10px;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 4px);
     padding-left: 8%;
     padding-right: 8%;
-    margin-bottom: 10px;
   }
   .nav-btn {
     flex: 1;
@@ -637,7 +638,7 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    padding: 8px 0 10px;
+    padding: 4px 0 8px;
     border: none;
     background: none;
     cursor: pointer;
@@ -1512,10 +1513,10 @@ const CHECKLIST_MASTER = [
     "환기 (방충망 있는 창문만)",
     "테이블 청소",
     "무선 청소기 바닥 청소",
-    "물걸레 청소 (로비, 다이닝, 푸드존)",
+    "물걸레 바닥 청소 (로비, 다이닝, 푸드존)",
     "스터디룸 청소 (칠판 닦기, 의자 정리 포함)",
     "로봇 청소기 (청소 마무리 후 충전)",
-    "로비 공용 물품 정리 (담요, 독서대, 휴대폰 충전기 등)",
+    "로비 공용 물품 정리 (담요, 휴대폰 충전기 등)",
   ]},
   { category: "커피 머신 관리", icon: CHECKLIST_ICONS.coffee, iconScale: 0.85, items: [
     "원두 보충 (마일드, 예가체프)",
@@ -1534,7 +1535,7 @@ const CHECKLIST_MASTER = [
     "전자레인지 유리판 세척",
     "하수구 음식물 쓰레기 정리",
     "싱크대 내부 및 주변 청소",
-    "음식물 쓰레기 배출 후 음식물 쓰레기통 세척",
+    "음식물 배출 후 음식물 쓰레기통 세척",
   ]},
   { category: "미니 매점", icon: CHECKLIST_ICONS.drink, iconScale: 1, items: [
     "식품 입고 시 유통기한 입력",
