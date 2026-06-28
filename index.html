@@ -103,7 +103,7 @@
   }
 
   /* Check screen */
-  .check-body { padding: 20px 20px 180px; flex: 1; }
+  .check-body { padding: 20px 20px 200px; flex: 1; }
 
   .mode-toggle {
     display: flex;
@@ -223,7 +223,7 @@
   /* 인사말 박스 */
   .greeting-box {
     margin-top: 28px;
-    margin-bottom: 40px;
+    margin-bottom: 52px;
   }
   .greeting-row {
     display: flex;
@@ -254,6 +254,8 @@
     transform: translate(0, -50%);
     display: inline-block;
     animation: waveHand 0.6s ease-in-out 2;
+    animation-fill-mode: forwards;
+    transform-origin: center bottom;
   }
   .greeting-emoji-small { width: 68px; transform: translate(-10%, -50%); animation: waveHandSmall 0.6s ease-in-out 2; animation-fill-mode: forwards; }
   @keyframes waveHandSmall {
@@ -638,7 +640,7 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    padding: 4px 0 8px;
+    padding: 2px 0 6px;
     border: none;
     background: none;
     cursor: pointer;
@@ -931,7 +933,7 @@
   </div>
   <div class="screen" id="screen-checklist">
     <div class="check-body">
-      <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <div style="display:flex;gap:10px;margin-bottom:36px;">
         <div class="checklist-summary" id="checklistSummary" style="flex:1;margin-bottom:0;">
           <div class="checklist-summary-num" id="checklistDoneCount">0/0</div>
           <div class="checklist-summary-label">오늘 완료된 업무</div>
@@ -1247,8 +1249,10 @@ function finishLogin() {
   const emojiEl = document.getElementById("inGreetingEmoji");
   if (emojiEl) {
     emojiEl.style.animation = "none";
+    emojiEl.style.transform = "translate(0, -50%)";
     void emojiEl.offsetWidth;
     emojiEl.style.animation = "waveHand 0.6s ease-in-out 2";
+    emojiEl.style.animationFillMode = "forwards";
   }
   navigateTo("in");
   checkTodayButtons();
