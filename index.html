@@ -1222,9 +1222,11 @@ function navigateTo(screenName) {
       if (isAdminUser) {
         refreshBtnNav.style.left = "calc(12.5% - 20px)";
         refreshBtnNav.style.right = "";
+        refreshBtnNav.style.transform = "";
       } else {
-        refreshBtnNav.style.left = "50%";
-        refreshBtnNav.style.transform = "translateX(-50%)";
+        refreshBtnNav.style.left = "";
+        refreshBtnNav.style.right = "calc(12.5% - 20px)";
+        refreshBtnNav.style.transform = "";
       }
     } else {
       refreshBtnNav.style.display = "none";
