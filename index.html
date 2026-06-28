@@ -1307,7 +1307,15 @@ loginPinInput.addEventListener("keydown", (e) => {
 
 const refreshBtnEl = document.getElementById("refreshBtn");
 if (refreshBtnEl) {
-  refreshBtnEl.addEventListener("click", () => { location.reload(true); });
+  refreshBtnEl.addEventListener("click", async () => {
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) await reg.unregister();
+    }
+    const keys = await caches.keys();
+    for (const key of keys) await caches.delete(key);
+    location.reload(true);
+  });
 }
 
 const logoutBtnEl = document.getElementById("logoutBtn");
